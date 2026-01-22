@@ -3,7 +3,7 @@ name: Build PixelFarm EXE
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # позволяет запускать вручную
+  workflow_dispatch:
 
 jobs:
   syntax-check:
@@ -14,10 +14,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Check Python syntax
+      - name: Check syntax
         run: |
-          python -m py_compile standalone_bot.py
-          echo "✅ Syntax check passed!"
+          if [ -f "standalone_bot.py" ]; then
+            python -m py_compile standalone_bot.py
+            echo "✅ Syntax check passed!"
+          else
+            echo "❌ Файл standalone_bot.py не найден!"
+            exit 1
+          fi
 
   build:
     needs: syntax-check
@@ -33,7 +38,12 @@ jobs:
           pip install pyinstaller aiogram==2.25.1 python-dotenv aiohttp
       - name: Build executable
         run: |
-          pyinstaller --onefile --console --name PixelFarm standalone_bot.py
+          if [ -f "standalone_bot.py" ]; then
+            pyinstaller --onefile --console --name PixelFarm standalone_bot.py
+          else
+            echo "❌ Файл standalone_bot.py не найден!"
+            exit 1
+          fi
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
