@@ -395,7 +395,7 @@ if __name__ == "__main__":
         await callback.message.edit_text("🌍 Выберите зону:", reply_markup=kb)
 
     @dp.callback_query_handler(zone_cb.filter())
-    async def select_zone(callback: types.CallbackQuery, callback_ dict):
+    async def select_zone(callback: types.CallbackQuery, callback_dict):
         zone_name = callback_data['name']
         user = get_user(callback.from_user.id)
         update_user(callback.from_user.id, current_zone=zone_name)
